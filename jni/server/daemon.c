@@ -10,9 +10,6 @@
 static const char *rdbs = "/stor.db";
 static const char *rdbu = "/user.db";
 
-static int get_nprocs(){
-	return 1;
-}
 
 int server_main(server_t *svr, struct sockaddr *addr, int len, const char *rdir){
     int sock;
