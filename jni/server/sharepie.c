@@ -96,8 +96,14 @@ static int spie_daemon(sharepie_t *sp, int nochdir, int  noclose)
    return 1;
 }
 
+void spie_signal_usr1_handler(int sig){
+    log_info("receive usr1 signal, exit PieBox\n");
+    _exit(0);
+}
+
 int spie_start(sharepie_t *sp, int bg){
     struct sockaddr_in  addr;
+    struct sigaction action;
     int sock;
     int rc;
  
@@ -117,6 +123,15 @@ int spie_start(sharepie_t *sp, int bg){
             return rc;
         }
     }
+    // set sigaction function
+    action.sa_handler = spie_signal_usr1_handler;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+    if(sigaction(SIGUSR1, &action, NULL)){
+        log_warn("set signal action handler fail\n");
+        return -1;
+    }
+
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock < 0){

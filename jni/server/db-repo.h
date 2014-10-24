@@ -36,6 +36,8 @@ typedef struct _dbrepo_file{
 int dbrepo_init(dbrepo_t *repo, const char *rdir, const char *rdbs, const char *rdbu);
 int dbrepo_fini(dbrepo_t *repo);
 
+int dbrepo_clean(dbrepo_t *repo);
+
 char *dbrepo_build_rpath(dbrepo_t *repo, int type, const char *fpath);
 
 int dbrepo_rfile_insert(dbrepo_t *repo, int64_t key, rfile_t *file);

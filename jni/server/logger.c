@@ -40,7 +40,7 @@ static struct logger_ltos __log_ltos[] = {
 };
 
 static logger_t	    __log_data = {};
-static int __log_level = LOGGER_WARN;
+static int __log_level = LOGGER_INFO;
 
 void logger_set(int level){
 	__log_level = level;

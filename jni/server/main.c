@@ -1,6 +1,7 @@
 
 #include "server.h"
 #include "logger.h"
+#include "sharepie.h"
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -9,18 +10,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-extern int server_main(server_t *svr, struct sockaddr *addr, int len, 
-        const char *rdir);
-
 static void usage(){
     printf("usage : iarch rootdir [service-port]\n");
     printf("    rootdir - for iarch server data\n");
     printf("    service-port - for iarch server listenning port\n");
     printf("        default port is 8086\n");
 }
-    
-static server_t svr;
-static struct sockaddr_in sin;
+
+static sharepie_t __sp;
 static struct stat rs;
 
 int main(int argc, char *argv[]){
@@ -28,6 +25,7 @@ int main(int argc, char *argv[]){
     short port = SERVER_DEFAULT_PORT;
     int rc;
 
+#if 1
     if(argc < 2){
         usage();
         return -1;
@@ -43,14 +41,24 @@ int main(int argc, char *argv[]){
     if(argc > 2){
         port = (short)atoi(argv[2]);
     }
-
+#else
+    rdir = "/opt/PieBox";
+#endif
     logger_init();
 
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = 0;
-    sin.sin_port = htons(port);
+    rc = spie_init(&__sp);
+    if(rc != 0){
+        log_warn("init sharepie struct fail!\n");
+        return -1;
+    }
 
-    server_main(&svr, (struct sockaddr *)&sin, sizeof(sin), rdir);
+    rc = spie_set_param(&__sp, rdir, port);
+    if(rc != 0){
+        log_warn("set sharepie param fail:%d\n", rc);
+        return -1;
+    }
+
+    spie_start(&__sp, 0);
 
     return 0;
 }

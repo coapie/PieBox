@@ -17,7 +17,7 @@ LDFLAGS = -static -L$(CROSS_LD)
 
 STRIP =$(CROSS)strip
 
-TARGET = iarch
+TARGET = PieBoxCli
 
 #objs = tlv.o array.o hashset.o
 objs += md5.o cmp.o iarch_mgmt.o iarch_stor.o fixbuffer.o fixarray.o

@@ -13,15 +13,16 @@ CC	= $(CROSS)gcc
 CFLAGS	= -Wall -O3 -I. -I$(CROSS_INC) -I../common
 #CFLAGS += -DSQLITE_OMIT_LOAD_EXTENSION
 
-LDFLAGS = -static -L$(CROSS_LD) -levent -pthread
+
+LDFLAGS = -static -L$(CROSS_LD) -levent -pthread -ldl
 
 STRIP =$(CROSS)strip
 
-TARGET = iarch
+TARGET = PieBox
 
 objs = md5.o rbtree.o logger.o fixbuffer.o fixarray.o fixmap.o cmp.o iarch_mgmt.o iarch_stor.o
 objs += db-user.o db-stor.o svr-trans.o svr-mgmt.o svr-stor.o db-repo.o server.o
-objs += daemon.o main.o
+objs += sharepie.o main.o
 
 vpath %.c ../common
 

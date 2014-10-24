@@ -27,7 +27,6 @@ static const char dbrepo_default_basedir[][SUBDIR_LEN] = {
     ""
 };
 
-
 int dbrepo_init(dbrepo_t *repo, const char *rdir, const char *dbstor, const char *dbuser){
     char *db;
     int len;
@@ -176,4 +175,7 @@ char *dbrepo_build_rpath(dbrepo_t *repo, int type, const char *fpath){
     return rpath;
 }
 
+int dbrepo_clean(dbrepo_t *repo){
+    return 0;
+}
 

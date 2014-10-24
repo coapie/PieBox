@@ -221,6 +221,8 @@ static void worker_errorcb(struct bufferevent *bev, short error, void *ctx){
 static void *worker_routine(void *data){
     worker_t  *worker = (worker_t *)data;
 
+    log_info("worker is initializing...\n");
+
     worker->evbase = event_base_new();
     if(worker->evbase == NULL){
         log_warn("create event base in worker %d fail\n", worker->idx);
@@ -343,6 +345,7 @@ int server_init(server_t *server, int workers){
         worker->server = server;
 
         if(pthread_create(&worker->wid, NULL, worker_routine, worker) != 0){
+            log_warn("create thread %d fail\n", i);
             close(socks[0]);
             close(socks[1]);
             break;
@@ -361,4 +364,7 @@ int server_init(server_t *server, int workers){
     return 0;
 }
 
+int server_fini(server_t *svr){
+    return 0;
+}
 
