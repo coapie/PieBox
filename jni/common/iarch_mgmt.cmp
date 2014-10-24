@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <errno.h>
+
+#include "osapi.h"
+#include "cmp.h"
+
+// authen
+
+struct im_seed_req{
+    1:string user
+    2:binary seed
+}
+
+struct im_seed_rsp{
+    1:i32 sesid
+    2:string user
+    3:binary seed
+}
+
+struct im_auth_req{
+    1:string user
+    2:string where
+    3:binary cred
+    4:i32 version
+}
+
+struct im_auth_rsp{
+    1:i64 uid
+    2:i32 version
+}
+
+// user management
+struct im_user_add_req{
+    1:string user
+    2:i32 type
+
+    3:binary cred
+}
+
+struct im_user_add_rsp{
+    1:i64 uid
+}
+
+struct im_user_del_req{
+    1:string user
+}
+
+struct im_user_del_rsp{
+    1:i64 uid
+}
+
+struct im_user_list_req{
+    1:i32 type
+}
+
+struct user{
+    1:i64 uid
+    2:i32 type
+    3:i32 status
+}
+
+struct im_user_list_rsp{
+    1:list<user> users
+}
+
+struct im_user_update_req{
+    1:i64 uid
+    2:string user
+    3:i32 type
+    4:binary cred
+}
+
+struct im_user_update_rsp{
+    1:i32 errcode
+}
+
+struct im_user_lookup_req{
+    1:string user
+}
+
+struct im_user_lookup_rsp{
+    1:i64 uid
+    2:i32 type
+    3:i32 status
+}
+
+// appliance system information
+struct im_system_status_req{
+    1:i32 fake
+}
+
+struct nif{
+    1:string name
+    2:string mac
+    3:string addr
+}
+
+struct im_system_status_rsp{
+    1:i32 capacity_used
+    2:i32 capacity_free
+    3:i32 battery
+    4:list<nif> nifs
+}
+
