@@ -14,6 +14,12 @@
 static const char *rdbs = "/stor.db";
 static const char *rdbu = "/user.db";
 
+#ifdef ANDROID_NDK
+static int get_nprocs(){
+	return 1;
+}
+#endif
+
 int spie_init(sharepie_t *sp){
     memset(sp, 0, sizeof(*sp));
     
@@ -35,11 +41,14 @@ int spie_fini(sharepie_t *sp){
 int spie_set_param(sharepie_t *sp, const char *rdir, short port){
     int len;
 
+    log_info("spie set param : %s %d\n", rdir, port);
+
     sp->port = port;
 
     len = strlen(rdir) + 1;
     sp->rdir = osapi_malloc(len);
     if(sp->rdir == NULL){
+    	log_warn("malloc memory for spie rdir fail\n");
         return -ENOMEM;
     }
     strcpy(sp->rdir, rdir);
@@ -108,7 +117,7 @@ int spie_start(sharepie_t *sp, int bg){
     int rc;
  
     if(bg){
-        rc = spie_daemon(sp, 0, 1); 
+        rc = spie_daemon(sp, 1, 1);
         switch(rc){
         case 0:
             log_info("share pie is run in background\n");
@@ -116,6 +125,8 @@ int spie_start(sharepie_t *sp, int bg){
 
         case 1:
             log_info("share pie daemon is running...\n");
+ //           logger_fini();
+ //           logger_init();
             break;
 
         default:

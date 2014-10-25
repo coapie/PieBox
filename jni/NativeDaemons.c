@@ -1,7 +1,7 @@
 #include "com_coapie_piebox_NativeDaemons.h"
 
 #include "server/logger.h"
-#include "server/server.h"
+#include "server/sharepie.h"
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -11,13 +11,11 @@
 #include <stdlib.h>
 #include <android/log.h>
 
+static sharepie_t __sp;
 
-static server_t __server;
-static char __server_rdir[1024] = "";
-static short __server_port = 8086;
-
-static struct sockaddr_in __sin;
-static struct stat __rs;
+static sharepie_t *get_spie(){
+	return &__sp;
+}
 
 /*
  * Class:     com_coapie_piebox_NativeDaemons
@@ -26,12 +24,12 @@ static struct stat __rs;
  */
 JNIEXPORT jint JNICALL Java_com_coapie_piebox_NativeDaemons_setNativeRepoParam
   (JNIEnv *env, jobject obj, jstring rdir, jshort port){
-	char *dir = (*env)->GetStringUTFChars(env, rdir, 0);
+
+	const char *dir = (*env)->GetStringUTFChars(env, rdir, 0);
 
 	log_info("setNativeRepoParam :%s %d\n", dir,  port);
 
-	__server_port = port;
-	strcpy(__server_rdir, dir);
+	spie_set_param(get_spie(), dir, port);
 
 	(*env)->ReleaseStringUTFChars(env, rdir, dir);
 
@@ -48,7 +46,7 @@ JNIEXPORT jint JNICALL Java_com_coapie_piebox_NativeDaemons_getNativeRepoStatus
   (JNIEnv *env, jobject obj){
 	log_info("getNativeRepoStatus\n");
 
-	return __server.status;
+	return 0;
 }
 
 /*
@@ -62,17 +60,9 @@ JNIEXPORT jint JNICALL Java_com_coapie_piebox_NativeDaemons_startNativeRepo
 
 	log_info("startNativeRepo\n");
 
-	 rc = stat(__server_rdir, &__rs);
-	 if(rc != 0){
-		 log_warn("startNativeRepo fail:rdir is not exists\n");
-		 return -1;
-	 }
+	spie_start(get_spie(), 1);
 
-    __sin.sin_family = AF_INET;
-    __sin.sin_addr.s_addr = 0;
-    __sin.sin_port = htons(__server_port);
-
-    return server_main(&__server, (struct sockaddr *)&__sin, sizeof(__sin), __server_rdir);
+	return 0;
 }
 
 /*
@@ -84,6 +74,7 @@ JNIEXPORT jint JNICALL Java_com_coapie_piebox_NativeDaemons_stopNativeRepo
   (JNIEnv *env, jobject obj){
 	log_info("stopNativeRepo\n");
 
+	spie_stop(get_spie());
 	return 0;
 }
 
@@ -175,6 +166,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 	jint result = -1;
 
 	logger_init();
+    if(spie_init(get_spie()) != 0){
+        log_warn("init sharepie struct fail!\n");
+        return -1;
+    }
 
 	if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
 		log_warn("JNI_OnLoad GetEnv failed!\n");

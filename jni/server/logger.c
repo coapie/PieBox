@@ -73,7 +73,7 @@ int logger_print(int level, char *fmt, ...){
     if(!log->log_init){
         buf[size] = '\0';
 #ifdef ANDROID_NDK
-        __android_log_print(level, "repo",  "%s", buf);
+        __android_log_print(level, "SharePie",  "%s", buf);
 #else
         printf("%s", buf);
 #endif
@@ -93,7 +93,11 @@ int logger_init(){
     }
 
     log->log_serv.sin_family = AF_INET;
+#ifdef ANDROID_NDK
+    log->log_serv.sin_addr.s_addr = inet_addr("192.168.1.16");
+#else
     log->log_serv.sin_addr.s_addr = inet_addr("127.0.0.1");
+#endif
     log->log_serv.sin_port = htons(4040);
 
     if(connect(log->log_sock, (struct sockaddr *)&log->log_serv, sizeof(struct sockaddr_in)) < 0){
