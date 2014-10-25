@@ -115,6 +115,11 @@ int spie_start(sharepie_t *sp, int bg){
     struct sigaction action;
     int sock;
     int rc;
+
+    if(sp->rdir == NULL){
+        log_warn("before start sharepie, you need set rdir\n");
+        return -1;
+    }
  
     if(bg){
         rc = spie_daemon(sp, 1, 1);
@@ -125,8 +130,6 @@ int spie_start(sharepie_t *sp, int bg){
 
         case 1:
             log_info("share pie daemon is running...\n");
- //           logger_fini();
- //           logger_init();
             break;
 
         default:
@@ -134,6 +137,7 @@ int spie_start(sharepie_t *sp, int bg){
             return rc;
         }
     }
+
     // set sigaction function
     action.sa_handler = spie_signal_usr1_handler;
     sigemptyset(&action.sa_mask);
@@ -189,6 +193,7 @@ int spie_start(sharepie_t *sp, int bg){
 int spie_stop(sharepie_t *sp){
     int rc;
 
+    log_info("stop sharepie daemon pid:%d\n", (int)sp->pid);
     rc = kill(sp->pid, SIGUSR1);
     if(rc == 0){
         // sleep 10ms, let worker exit!
